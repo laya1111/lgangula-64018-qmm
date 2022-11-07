@@ -1,0 +1,71 @@
+---
+title: "QMM Assignment 5"
+author: "Laya Sree Gangula"
+date: "2022-11-06"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
+---
+```{r}
+#The Research and Development department at Emax Corporation has developed three new items. It is now necessary to decide which mixture of these products should be produced. The management has designated three elements as needing special attention:
+#1. Total Profit, 
+#2. stable employment conditions and
+#3.double the company's earnings from this year's $75 million in the following year.
+#Objective Function
+#Maximize Z = P - 6C - 3D, where
+#P = Over the course of the new products, the overall discounted profit,
+#C = Change relative to the current employment level, in either direction,
+#D = Reduce the earnings from the level of the current year, if necessary.
+```
+*Setting default values to get a clean output*
+```{r}
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+```
+
+*Loading the required packages*
+```{r}
+library(lpSolve)
+library(lpSolveAPI)
+library(latexpdf)
+```
+```{r}
+#creating the model after loading the LP file from the current directory.
+#The amounts above and below the employment level goal, if any, are referred to as Y1plus and Y1minus, respectively.
+#equivalent definitions of y2plus and y2minus for the purpose of determining earnings the following year.
+#Assign the variables x1, x2, and x3 the production levels of Products 1, 2, and 3, respectively.
+#P can also be expressed in terms of x1, x2, and x3, as well as the objective function, y1plus, y1minus, y2plus, and y2minus.
+```
+```{r}
+emax.1 <- read.lp("emax.lp", type = c("lp"))
+print(emax.1)
+```
+```{r}
+#The impacts of each of the innovative products (per unit of production) on all of these factors are shown in the following table:
+```
+```{r}
+emax.table <- matrix(c("Total Profit", "Employment Level", "Earnings Next Year",
+                       20,6,8,
+                       15,4,7,
+                       25,5,5,
+                       "Maximize","=50",">=75",
+                       "Millions of Dollars", "Hundreds of Employees", "Millions of Dollars"), ncol=6, byrow = F)
+colnames(emax.table) <- c("Factor","Product 1", "Product 2", "Product 3", "Goal", "Units")
+as.table(emax.table)
+```
+
+```{r}
+#figuring out the goal programming paradigm to determine the variable and objective values
+solve(emax.1)
+get.objective(emax.1)
+get.variables(emax.1)
+```
+```{r}
+#Interpretation:
+#1.The business must employ X1, X2, and X3 as the units of combination in order to maximize the target function. The ultimate solution was "0," as indicated by the codes X1 for Product 1, X2 for Product 2, and X3 for Product 3, hence 20 units of Product 1 and 15 units of Product 2 cannot be produced. However, X3 has changed, meaning that the company can only make 15 units of Product 3—the only product—in order to increase profit.
+#2.With a cap of 50 hundred employees as the maximum, the objective was to stabilize employment levels. However, in this case, the business - level strategies more than that by 25 hundred employees (y1+), necessitating that payment of a penalty for the #surplus in the employee count.
+#3. The goal of y2plus and y2minus was to quantify the increase or decrease in earnings relative to the existing level, which in this example is "0," denoting that there is no change in wages between the current year and the one after that. The earnings for the following year that remain the same as a result.
+#4. The value of the objective function, in this case 225 million dollars, highlights the profit that the business is attempting to maximize.
+```
